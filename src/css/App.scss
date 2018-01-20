@@ -1,0 +1,126 @@
+@import 'functions';
+@import 'mixins';
+@import 'settings';
+@import 'fonts';
+@import 'prism';
+//---COLORS
+$color-base: #525e74;
+$color-evt: #42d9f0;
+
+/*--- GENERALS ---*/
+
+body {
+  font-family: $family-serif, Arial, sans-serif;
+  font-size: 100%;
+  @include smoothfonts;
+  background: white;
+  color: $color-base;
+  font-weight: 300;
+  @include userselectnone;
+}
+
+.cal {
+  width: 90%;
+  margin: 5vh auto 0 auto;
+  @include flex;
+  &__day {
+    width: (100%/7);
+    min-height: 20vh;
+    box-sizing: border-box;
+    border: 1px solid darken(#f1f1f1, 3%);
+    cursor: pointer;
+    padding-bottom: 30px;
+  }
+  &__label {
+    font-size: 0.8em;
+    text-align: center;
+    padding: 10px;
+    background: #f1f1f1;
+    margin-bottom: 20px;
+  }
+  &__datelabel {
+    opacity: 0.5;
+    font-size: 0.8em;
+  }
+  &__evt {
+    position: relative;
+    width: 80%;
+    box-sizing: border-box;
+    padding: 10px 10px 20px 10px;
+    background: rgba($color-evt, 0);
+    border: 1px solid $color-evt;
+    border-top-width: 30px;
+    margin: 0 auto 10px auto;
+    transition: background 200ms ease;
+    &:hover {
+      //background: rgba($color-evt, 1);
+    }
+  }
+  &__tag {
+    font-size: 0.7em;
+    color: $color-evt;
+    text-transform: uppercase;
+  }
+  &__input-wrap {
+    margin-bottom: 5px;
+  }
+  &__input {
+    width: 100%;
+    padding: 0 0 5px 0;
+    border: 1px solid rgba($color-base, 0.05);
+    border-bottom: 1px solid rgba($color-base, 0.5);
+    padding: 5px;
+    margin: 5px 0;
+    box-sizing: border-box;
+    transition: border 200ms ease-in-out; //background: rgba($color-base, 0.05);
+    font-size: 0.85em;
+    color: $color-base;
+    transition: all 200ms ease;
+    @include placeholder {
+      color: rgba($color-base, 0.2);
+      font-size: 1em;
+    }
+    &:focus {
+      outline: 0;
+      border-color: rgba($color-evt, 0.05);
+      border-bottom-color: $color-evt;
+      background: rgba($color-evt, 0.08);
+    }
+    &.hide {
+      display: none;
+    }
+  }
+  &__inputLabel {
+    font-size: 1.1em;
+    line-height: 1;
+    transition: opacity 200ms ease;
+    &:hover{
+      opacity: 0.7;
+    }
+    &_name {
+      font-size: 1.3em;
+      font-weight: 400;
+    }
+  }
+  &__remove-btn {
+    top: -30px;
+    right: 5px;
+    position: absolute;
+    display: block;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-shadow: none;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    border: 0;
+    color: #fff;
+    font-size: 1.7em;
+    line-height: 1;
+    cursor: pointer;
+    &:focus{
+      outline: 0;
+    }
+  }
+}
