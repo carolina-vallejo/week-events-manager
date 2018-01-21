@@ -83,7 +83,7 @@ class Cell extends Component {
           onClick={this.props.onClick}
           className='cal__day'>
           <div
-          className='cal__label'>
+          className={this.props.className}>
             {this.props.label}
           </div>
           {this.props.value}
@@ -97,13 +97,11 @@ class App extends Component {
     super(props)
 
     this.state={ 
-      eventsByDay: Array(7).fill([]),
-      actualDayEvt: {}
+      eventsByDay: Array(7).fill([])
     };
 
     this.dateRange=moment.range(moment().startOf('week'), moment().endOf('week'));
     this.rangeArr=Array.from(this.dateRange.by('day'));
-    this.counterEvts=0;
   }
 
   /*--- CREATE EVENT ---*/
@@ -112,10 +110,7 @@ class App extends Component {
     const days=this.state.eventsByDay.slice();
     const evts=days[i].slice();
 
-    this.counterEvts++;
-
     evts.push({
-      id: this.counterEvts,
       date:  this.rangeArr[i].format('YYYY-MM-DD'),
       hideInputName: false,
       hideStartTime: false,
@@ -177,7 +172,8 @@ class App extends Component {
       eventsByDay: days,
     });
 
-  }     
+  }
+
   editEvt=(e)=> {
    
     const type=e.target.id.split('-')[1];
@@ -304,6 +300,10 @@ class App extends Component {
       <Cell 
         onClick={this.createEvt(opt.dayId)}
         key={'cell' + opt.dayId.toString()}  
+        className={
+          classNames('cal__label', 
+            {cal__label_today: this.rangeArr[opt.dayId].isSame(moment(), 'day')})
+        }
         label={this.rangeArr[opt.dayId].format('dddd DD')}     
         value={
           <Target
