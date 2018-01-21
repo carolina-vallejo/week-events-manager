@@ -207,24 +207,26 @@ class App extends Component {
     });
   }    
 
-  moveToTarget=(opt)=>{
-
+  moveToTarget=(opt)=>{    
     const allDays=this.state.eventsByDay.slice();
+
     const evtDay=allDays[opt.dayId].slice();
     const dragObj=evtDay.splice(opt.evtId, 1);
     
     dragObj[0].date=this.rangeArr[opt.targetDayId].format('YYYY-MM-DD');
-
+    allDays[opt.dayId]=evtDay;
+    
     const evtTargetDay=allDays[opt.targetDayId].slice();
     evtTargetDay.push(dragObj[0]);
 
-    
-    allDays[opt.dayId]=evtDay;
+   
     allDays[opt.targetDayId]=evtTargetDay;
 
     this.setState({
       eventsByDay: allDays,
-    });
+    });      
+
+
   }
 
   renderEvent(opt){

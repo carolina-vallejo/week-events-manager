@@ -23,7 +23,7 @@ const boxSource = {
 			props.moveToTarget({
 				evtId: evtId,
 				dayId: dayId,
-				targetDayId: dropResult.name
+				targetDayId: parseInt(dropResult.name, 10)
 			});
 
 			//console.log(`You dropped ${item.id} into ${dropResult.name}!`)
