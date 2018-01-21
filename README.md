@@ -1,6 +1,6 @@
 # Weekly events calendar
 
-A running version of the code in this repository is [available here](http://carolinavallejo.x10.mx/test/weekly-events-calendar)
+A running version of this repository is [available here](http://carolinavallejo.x10.mx/test/weekly-events-calendar)
 
 <img src="http://carolinavallejo.x10.mx/images/weeklyEvtsManager.gif" width="400">
 
