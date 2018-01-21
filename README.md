@@ -2,9 +2,9 @@
 
 A running version of the code in this repository is [viewable here](http://carolinavallejo.x10.mx/test/weekly-events-calendar)
 
-<img src="http://carolinavallejo.x10.mx/images/weeklyEvtsManager.gif">
+<img src="http://carolinavallejo.x10.mx/images/weeklyEvtsManager.gif" width="400">
 
-## description
+## Description
 
 This repository is an answer to a front-end challenge for Shyftplan.
 
