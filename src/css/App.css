@@ -162,7 +162,8 @@ body {
     cursor: pointer; }
     @media only screen and (max-width: 1024px) {
       .cal__day {
-        width: 50%; } }
+        width: 50%;
+        border: 1px solid #dee1e7; } }
     @media only screen and (max-width: 640px) {
       .cal__day {
         width: 100%; } }
