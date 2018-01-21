@@ -3,8 +3,10 @@ import './css/App.css';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
-import { DragSource } from 'react-dnd';
+import { DragDropContextProvider } from 'react-dnd'
+import HTML5Backend from 'react-dnd-html5-backend'
+import Target from './DropTarget'
+import DragObj from './DragObj'
 
 const moment=extendMoment(Moment);
 
@@ -12,9 +14,10 @@ class Button extends Component{
   render(){
     return(
       <button
-        onClick={(e) => this.props.onClick(e)}
-        className={this.props.className}>
-        {this.props.value}
+        id={this.props.id}
+        className='cal__remove-btn'
+        onClick={this.props.onClick}>
+        {'×'}
       </button>
 
     )
@@ -24,7 +27,8 @@ class ValueInput extends Component{
   render(){
     return(
       <div 
-        onClick={(e) => this.props.onClick(e)}
+        id={this.props.id}
+        onClick={this.props.onClick}
         className={this.props.className}>
         {this.props.value}
       </div>  
@@ -32,22 +36,24 @@ class ValueInput extends Component{
   }
 }
 class InputText extends Component{
-  handleClick=(e) => { 
+  handleClick=(e)=> { 
      e.stopPropagation();
   }
   render(){
     return(
-      <div className='cal__input-wrap'>
+      <div 
+        className='cal__input-wrap'>
         <span
           className='cal__tag'>
           {this.props.value}
         </span>
         <input 
+          id={this.props.id}
           className={this.props.className}
           placeholder={this.props.placeholder}
-          type="text" 
+          type='text' 
           onClick={this.handleClick}
-          onKeyPress={(e) => this.props.onKeyPress(e)}
+          onKeyPress={this.props.onKeyPress}
         />
      
       </div>
@@ -56,13 +62,14 @@ class InputText extends Component{
 }
 
 class Event extends Component {
-  handleClick=(e) => { 
+  handleClick=(e)=> { 
      e.stopPropagation();
   }  
   render(){
     return (
-      <div 
-        className="cal__evt"
+      <div
+        id={this.props.id}
+        className='cal__evt'
         onClick={this.handleClick}>
         {this.props.children}
       </div>
@@ -73,10 +80,10 @@ class Cell extends Component {
   render(){
     return (
         <div 
-          onClick={ (e) => this.props.onClick(e) }
-          className="cal__day">
+          onClick={this.props.onClick}
+          className='cal__day'>
           <div
-          className="cal__label">
+          className='cal__label'>
             {this.props.label}
           </div>
           {this.props.value}
@@ -90,25 +97,30 @@ class App extends Component {
     super(props)
 
     this.state={ 
-      eventsByDay: Array(7).fill([])
+      eventsByDay: Array(7).fill([]),
+      actualDayEvt: {}
     };
-    //this.handleChange=this.handleChange.bind(this);
 
     this.dateRange=moment.range(moment().startOf('week'), moment().endOf('week'));
     this.rangeArr=Array.from(this.dateRange.by('day'));
-    
+    this.counterEvts=0;
   }
 
-  createEvt=(i) => (e) => {
+  /*--- CREATE EVENT ---*/
+  createEvt=(i)=> (e)=> {
 
     const days=this.state.eventsByDay.slice();
     const evts=days[i].slice();
 
+    this.counterEvts++;
+
     evts.push({
+      id: this.counterEvts,
       date:  this.rangeArr[i].format('YYYY-MM-DD'),
       hideInputName: false,
       hideStartTime: false,
-      hideEndTime: false
+      hideEndTime: false,
+
     })
 
     days[i]=evts;
@@ -119,18 +131,22 @@ class App extends Component {
 
   } 
 
+  handleKeyPress=(e)=> {
 
-  handleKeyPress=(opt) => (e) => {
-    if (e.key === 'Enter') {
+    if (e.key==='Enter') {
+
+      const type=e.target.id.split('-')[1];
+      const dayId=parseInt(e.target.id.split('-')[2],10);
+      const evtId=parseInt(e.target.id.split('-')[3],10); 
 
       const days=this.state.eventsByDay.slice();
-      var evt=days[opt.dayId][opt.evtId];
+      const evt=days[dayId][evtId];
 
-      if(opt.type ==='name'){
+      if(type==='name'){
         evt.name=e.target.value;
         evt.hideInputName=true;
        
-      }else if(opt.type === 'startTime'){
+      }else if(type==='stime'){
         evt.startTime=e.target.value;
         evt.hideStartTime=true;
 
@@ -139,7 +155,7 @@ class App extends Component {
         evt.hideEndTime=true;
       }
 
-      days[opt.dayId][opt.evtId]= evt;
+      days[dayId][evtId]=evt;
 
       this.setState({
         eventsByDay: days,
@@ -148,26 +164,34 @@ class App extends Component {
     }
   }  
 
-  removeEvt=(opt) => (e) => {
+  removeEvt=(e)=> {
+
+    const str=e.target.id.replace('btn-','');
+    const dayId=str.split('-')[0];
+    const evtId=str.split('-')[1];
 
     const days=this.state.eventsByDay.slice();
-    days[opt.dayId].splice(opt.dayEvt, 1);
+    days[dayId].splice(evtId, 1);
 
     this.setState({
       eventsByDay: days,
     });
 
   }     
-  editEvt=(opt) => (e) => {
-
+  editEvt=(e)=> {
+   
+    const type=e.target.id.split('-')[1];
+    const dayId=parseInt(e.target.id.split('-')[2],10);
+    const evtId=parseInt(e.target.id.split('-')[3],10);     
+    
     const days=this.state.eventsByDay.slice();
-    var evt=days[opt.dayId][opt.evtId];
+    const evt=days[dayId][evtId];
 
-    if(opt.type ==='name'){
+    if(type==='name'){
       evt.name='';
       evt.hideInputName=false;
      
-    }else if(opt.type === 'startTime'){
+    }else if(type==='stime'){
       evt.startTime='';
       evt.hideStartTime=false;
 
@@ -176,102 +200,98 @@ class App extends Component {
       evt.hideEndTime=false;
     }
 
-    days[opt.dayId][opt.evtId]= evt;
+    days[dayId][evtId]=evt;
 
     this.setState({
       eventsByDay: days,
     });
   }    
 
+  moveToTarget=(opt)=>{
+
+    const allDays=this.state.eventsByDay.slice();
+    const evtDay=allDays[opt.dayId].slice();
+    const dragObj=evtDay.splice(opt.evtId, 1);
+    
+    dragObj[0].date=this.rangeArr[opt.targetDayId].format('YYYY-MM-DD');
+
+    const evtTargetDay=allDays[opt.targetDayId].slice();
+    evtTargetDay.push(dragObj[0]);
+
+    
+    allDays[opt.dayId]=evtDay;
+    allDays[opt.targetDayId]=evtTargetDay;
+
+    this.setState({
+      eventsByDay: allDays,
+    });
+  }
+
   renderEvent(opt){
     var evt=this.state.eventsByDay[opt.dayId][opt.evtId];
-
     return (
-      <Event
-        key={'evt' + opt.evtId.toString()}  
+
+      <DragObj
+        id={`dragobj-${opt.dayId}-${opt.evtId}`} 
+        key={`evt-${opt.dayId}-${opt.evtId}`} 
+        moveToTarget={this.moveToTarget}
         children={
-          <div className='cal__input-group'>
-            <Button
-              value="×"
-              className='cal__remove-btn'
-              onClick={this.removeEvt({
-                dayId: opt.dayId, 
-                evtId: opt.evtId
-              })}
-            />          
-            
-            <div className='cal__datelabel'>{evt.date}</div>
-
-            <InputText 
-              placeholder="Enter name"
-              value="Event"
-              className={
-                classNames('cal__input', {hide: evt.hideInputName})
-              }
-              onKeyPress={this.handleKeyPress({
-                dayId: opt.dayId, 
-                evtId: opt.evtId,
-                type: 'name'
-              })}
-            />
-            
-            <ValueInput
-              className={classNames('cal__inputLabel', 'cal__inputLabel_name')}
-              onClick={this.editEvt({
-                dayId: opt.dayId, 
-                evtId: opt.evtId,
-                type: 'name'
-              })}
-              value={evt.name}
-            />
-
-
-            <InputText 
-              placeholder="Enter time"
-              value="Start Time"
-              classLabel='cal__inputLabel'
-              className={
-                classNames('cal__input', {hide: evt.hideStartTime})
-              }              
-              onKeyPress={this.handleKeyPress({
-                dayId : opt.dayId, 
-                evtId: opt.evtId,
-                type: 'startTime'
-              })}
-              />
-
-            <ValueInput
-              className='cal__inputLabel'
-              onClick={this.editEvt({
-                dayId: opt.dayId, 
-                evtId: opt.evtId,
-                type: 'startTime'
-              })}
-              value={evt.startTime}
-            />
-
-            <InputText 
-              placeholder="Enter time"
-              value="End Time"
-              className={
-                classNames('cal__input', {hide: evt.hideEndTime})
-              }              
-              onKeyPress={this.handleKeyPress({
-                dayId : opt.dayId, 
-                evtId: opt.evtId,
-                type: 'endTime'
-              })}
-              /> 
-            <ValueInput
-              className='cal__inputLabel'
-              onClick={this.editEvt({
-                dayId: opt.dayId, 
-                evtId: opt.evtId,
-                type: 'endTime'
-              })}
-              value={evt.endTime}
-            />                           
-          </div>
+          <Event
+            children={
+              <div className='cal__input-group'>
+                <Button
+                  id={`btn-${opt.dayId}-${opt.evtId}`} 
+                  onClick={this.removeEvt}
+                />          
+                <div className='cal__datelabel'>{evt.date}</div>
+                <InputText 
+                  id={`input-name-${opt.dayId}-${opt.evtId}`} 
+                  placeholder='Enter name'
+                  value='Event'
+                  className={
+                    classNames('cal__input', {hide: evt.hideInputName})
+                  }
+                  onKeyPress={this.handleKeyPress}
+                />
+                <ValueInput
+                  id={`value-name-${opt.dayId}-${opt.evtId}`} 
+                  className={classNames('cal__input-label', 'cal__input-label_name')}
+                  onClick={this.editEvt}
+                  value={evt.name}
+                />
+                <InputText 
+                  id={`input-stime-${opt.dayId}-${opt.evtId}`} 
+                  placeholder='Enter time'
+                  value='Start Time'
+                  className={
+                    classNames('cal__input', {hide: evt.hideStartTime})
+                  }              
+                  onKeyPress={this.handleKeyPress}
+                  />
+                <ValueInput
+                  id={`value-stime-${opt.dayId}-${opt.evtId}`} 
+                  className='cal__input-label'
+                  onClick={this.editEvt}
+                  value={evt.startTime}
+                />
+                <InputText 
+                  id={`input-etime-${opt.dayId}-${opt.evtId}`} 
+                  placeholder='Enter time'
+                  value='End Time'
+                  className={
+                    classNames('cal__input', {hide: evt.hideEndTime})
+                  }              
+                  onKeyPress={this.handleKeyPress}
+                  /> 
+                <ValueInput
+                  id={`value-etime-${opt.dayId}-${opt.evtId}`} 
+                  className='cal__input-label'
+                  onClick={this.editEvt}
+                  value={evt.endTime}
+                />                           
+              </div>
+            }
+          />
         }
       />
     );    
@@ -284,37 +304,46 @@ class App extends Component {
         key={'cell' + opt.dayId.toString()}  
         label={this.rangeArr[opt.dayId].format('dddd DD')}     
         value={
-          opt.item.map((item, i)=>{
-            return(
-              this.renderEvent({
-                dayId: opt.dayId,
-                evtId: i
+          <Target
+            name={opt.dayId} 
+            children={
+              opt.item.map((item, i)=>{
+                return(
+                  this.renderEvent({
+                    dayId: opt.dayId,
+                    evtId: i
+                  })
+                )
               })
-            )
-          })
+            }
+          />          
         }     
-      />
+      />        
     );    
   }
 
   render() {
     return (
-      <div>
-        <div className="cal">
-        {
-          this.state.eventsByDay.map((item, i)=>{
-            return (
-              this.renderCell({
-                  dayId: i,
-                  item: item
-                })
-              )
-            })
-          }
+      <DragDropContextProvider backend={HTML5Backend}>
+        <div className='cal'>
+          <h1 className='cal__title'> weekly event calendar</h1>
+          <div className='cal__wrapper'>
+            {
+            this.state.eventsByDay.map((item, i)=>{
+              return (
+                this.renderCell({
+                    dayId: i,
+                    item: item
+                  })
+                )
+              })
+            }
+          </div>
         </div>
-      </div>
+      </DragDropContextProvider>
     );
   }
 }
 
 export default App;
+

@@ -1,5 +1,15 @@
-## Description
+# Weekly events calendar
 
-This repository is the answer to a front-end challenge for a job application at Shifplan.
+A running version of the code in this repository is [viewable here](http://carolinavallejo.x10.mx/test/weekly-events-calendar)
 
-The task consist in build a week event manager in react
+<img src="http://carolinavallejo.x10.mx/images/weeklyEvtsManager.gif">
+
+## description
+
+This repository is an answer to a front-end challenge for Shyftplan.
+
+The task consist in build a interactive weekly events calendar in React.js
+
+---
+
+* This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
