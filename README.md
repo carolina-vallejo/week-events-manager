@@ -6,9 +6,8 @@ A running version of this repository is [available here](http://carolinavallejo.
 
 ## Description
 
-This repository is an answer to a front-end challenge for Shyftplan.
+This repository is a small app to create weekly events with drag and drop interaction in React.js
 
-The task consist in build an interactive weekly events calendar in React.js
 
 ---
 
